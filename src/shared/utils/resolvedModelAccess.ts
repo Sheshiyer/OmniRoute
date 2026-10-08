@@ -13,10 +13,10 @@ export function hasApiKeyModelRestrictions(
 ): boolean {
   return Boolean(
     metadata &&
-      (metadata.modelAccessMode === "restricted" ||
-        metadata.allowedModels?.length ||
-        metadata.blockedModels?.length ||
-        metadata.disableNonPublicModels === true)
+    (metadata.modelAccessMode === "restricted" ||
+      metadata.allowedModels?.length ||
+      metadata.blockedModels?.length ||
+      metadata.disableNonPublicModels === true)
   );
 }
 
