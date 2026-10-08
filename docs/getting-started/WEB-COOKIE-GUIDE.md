@@ -85,7 +85,8 @@ Different websites store authentication differently. Some require only cookies, 
 | Claude Web          | Full Cookie request header | `docs/providers/CLAUDE_WEB.md`  |
 | ChatGPT Web (Codex) | Full Cookie header         | `docs/providers/CHATGPT_WEB.md` |
 | Gemini Web          | _(verify)_                 |                                 |
-| Copilot Web         | _(verify)_                 |                                 |
+| Copilot Web         | _(verify)_                 | `docs/providers/COPILOT-M365.md` |
+| Microsoft 365 Copilot (BizChat) | WS access_token + chathubPath | `docs/providers/COPILOT-M365.md` |
 | Grok Web            | _(verify)_                 |                                 |
 | ...                 | ...                        | ...                             |
 
@@ -161,7 +162,7 @@ Recopy the credentials from a fresh network request after successfully opening a
 
 Web Cookie providers use your existing browser session.
 
-If your browser session expires or you sign out, you must copy a new set of credentials.
+If your browser session expires or you sign out, you must copy a new set of credentials. To automate cookie renewal for supported web providers, see the [Browser Session Sync Extension](../guides/SESSION-SYNC-EXTENSION.md) companion tool.
 
 ---
 

@@ -7,13 +7,16 @@
  * inner target so #9057 holds.
  */
 
-import { hasApiKeyModelRestrictions } from "../../../shared/utils/resolvedModelAccess.ts";
+import { isModelBlockedByPatterns } from "@/lib/db/apiKeys";
+import { isComboNameAllowedForKey } from "@/shared/utils/apiKeyPolicy";
+import { hasApiKeyModelRestrictions } from "@/shared/utils/resolvedModelAccess";
 
 export type ComboTargetKeyPolicyInfo = {
   allowedModels?: string[] | null;
   blockedModels?: string[] | null;
   disableNonPublicModels?: boolean | null;
   modelAccessMode?: string | null;
+  allowedCombos?: string[] | null;
 };
 
 export type ComboTargetKeyPolicyOptions = {
@@ -24,10 +27,7 @@ export type ComboTargetKeyPolicyOptions = {
   isModelAllowedForKey: (key: string, model: string) => Promise<boolean>;
 };
 
-export type ComboTargetPreflightDecision =
-  | "deny"
-  | "check-availability"
-  | "bypass-availability";
+export type ComboTargetPreflightDecision = "deny" | "check-availability" | "bypass-availability";
 
 function modelMatchesAllowPattern(pattern: string, model: string): boolean {
   if (pattern.endsWith("/*")) return model.startsWith(pattern.slice(0, -1));
@@ -42,6 +42,22 @@ function allowListCoversRequestedCombo(
   return allowedModels.some((pattern) => modelMatchesAllowPattern(pattern, requestedModelStr));
 }
 
+/**
+ * A stored (non-`auto/*`) combo named in the key's `allowedCombos` grants its
+ * own targets (#14197). `auto/*` combos keep per-candidate model checks (#9057).
+ */
+export function isExplicitlyAllowedComboForKey(
+  apiKeyInfo: ComboTargetKeyPolicyInfo | null | undefined,
+  requestedModelStr: string | null | undefined
+): boolean {
+  if (!apiKeyInfo || !requestedModelStr) return false;
+  return (
+    !requestedModelStr.startsWith("auto/") &&
+    Array.isArray(apiKeyInfo.allowedCombos) &&
+    isComboNameAllowedForKey(apiKeyInfo.allowedCombos, requestedModelStr)
+  );
+}
+
 export async function comboTargetPassesKeyModelPolicy(
   opts: ComboTargetKeyPolicyOptions
 ): Promise<boolean> {
@@ -49,6 +65,10 @@ export async function comboTargetPassesKeyModelPolicy(
   if (!apiKey || !apiKeyInfo) return true;
 
   if (!hasApiKeyModelRestrictions(apiKeyInfo)) return true;
+
+  if (isExplicitlyAllowedComboForKey(apiKeyInfo, requestedModelStr)) return true;
+
+  if (await isModelBlockedByPatterns(apiKeyInfo.blockedModels, targetModelStr)) return false;
 
   if (allowListCoversRequestedCombo(apiKeyInfo.allowedModels, requestedModelStr)) {
     return true;

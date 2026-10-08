@@ -100,15 +100,15 @@
       "configSource": "<custom-config>",
       "provider": "chatgpt-web-codex"
     },
+    "chatplayground": {
+      "className": "ChatPlaygroundExecutor",
+      "configSource": "<custom-config>",
+      "provider": "chatplayground"
+    },
     "cheaperinference": {
       "className": "CheaperInferenceExecutor",
       "configSource": "cheaperinference",
       "provider": "cheaperinference"
-    },
-    "chipotle": {
-      "className": "ChipotleExecutor",
-      "configSource": "<custom-config>",
-      "provider": "chipotle"
     },
     "cinf": {
       "className": "CheaperInferenceExecutor",
@@ -194,6 +194,11 @@
       "className": "CliproxyapiExecutor",
       "configSource": "<custom-config>",
       "provider": "cliproxyapi"
+    },
+    "cpl": {
+      "className": "ChatPlaygroundExecutor",
+      "configSource": "<custom-config>",
+      "provider": "chatplayground"
     },
     "cu": {
       "className": "CursorExecutor",
@@ -299,16 +304,6 @@
       "className": "GrokCliExecutor",
       "configSource": "grok-cli",
       "provider": "grok-cli"
-    },
-    "gembiz": {
-      "className": "GeminiBusinessExecutor",
-      "configSource": "<custom-config>",
-      "provider": "gemini-business"
-    },
-    "gemini-business": {
-      "className": "GeminiBusinessExecutor",
-      "configSource": "<custom-config>",
-      "provider": "gemini-business"
     },
     "gemini-web": {
       "className": "GeminiWebExecutor",
@@ -489,11 +484,6 @@
       "className": "OpencodeExecutor",
       "configSource": "opencode-zen",
       "provider": "opencode-zen"
-    },
-    "pepper": {
-      "className": "ChipotleExecutor",
-      "configSource": "<custom-config>",
-      "provider": "chipotle"
     },
     "perplexity-web": {
       "className": "PerplexityWebExecutor",
@@ -676,6 +666,6 @@
       "provider": "zai-web"
     }
   },
-  "keyCount": 135,
+  "keyCount": 133,
   "sharedInstances": []
 }

@@ -9,7 +9,6 @@ import { ollama_cloudProvider } from "./registry/ollama-cloud/index.ts";
 import { syntheticProvider } from "./registry/synthetic/index.ts";
 import { ideogramProvider } from "./registry/ideogram/index.ts";
 import { friendliaiProvider } from "./registry/friendliai/index.ts";
-import { sunoProvider } from "./registry/suno/index.ts";
 import { adapta_webProvider } from "./registry/adapta-web/index.ts";
 import { notion_webProvider } from "./registry/notion-web/index.ts";
 import { anthropicProvider } from "./registry/anthropic/index.ts";
@@ -23,6 +22,7 @@ import { llamagateProvider } from "./registry/llamagate/index.ts";
 import { glmProvider } from "./registry/glm/index.ts";
 import { glmtProvider } from "./registry/glm/t/index.ts";
 import { glm_cnProvider } from "./registry/glm/cn/index.ts";
+import { agnes_cnProvider } from "./registry/agnes/cn/index.ts";
 import { traeProvider } from "./registry/trae/index.ts";
 import { muse_spark_webProvider } from "./registry/muse-spark-web/index.ts";
 import { lmarenaProvider } from "./registry/lmarena/index.ts";
@@ -88,7 +88,6 @@ import { antigravityProvider } from "./registry/antigravity/index.ts";
 import { openaiProvider } from "./registry/openai/index.ts";
 import { snowflakeProvider } from "./registry/snowflake/index.ts";
 import { huggingfaceProvider } from "./registry/huggingface/index.ts";
-import { chipotleProvider } from "./registry/chipotle/index.ts";
 import { freeaiapikeyProvider } from "./registry/freeaiapikey/index.ts";
 import { qwen_cloudProvider } from "./registry/qwen-cloud/index.ts";
 import { qwen_cloud_token_planProvider } from "./registry/qwen-cloud-token-plan/index.ts";
@@ -105,6 +104,7 @@ import { hyperbolicProvider } from "./registry/hyperbolic/index.ts";
 import { lambda_aiProvider } from "./registry/lambda-ai/index.ts";
 import { t3_webProvider } from "./registry/t3-web/index.ts";
 import { conol_webProvider } from "./registry/conol-web/index.ts";
+import { chatplaygroundProvider } from "./registry/chatplayground/index.ts";
 import { iflytekProvider } from "./registry/iflytek/index.ts";
 import { crofProvider } from "./registry/crof/index.ts";
 import { moonshotProvider } from "./registry/moonshot/index.ts";
@@ -136,6 +136,7 @@ import { freemodel_devProvider } from "./registry/freemodel-dev/index.ts";
 import { gitlawb_gmiProvider } from "./registry/gitlawb/gmi/index.ts";
 import { gitlawbProvider } from "./registry/gitlawb/index.ts";
 import { liquidProvider } from "./registry/liquid/index.ts";
+import { arceeAiProvider } from "./registry/arcee-ai/index.ts";
 import { deepinfraProvider } from "./registry/deepinfra/index.ts";
 import { agyProvider } from "./registry/agy/index.ts";
 import { agnesProvider } from "./registry/agnes/index.ts";
@@ -202,7 +203,6 @@ import { maritalkProvider } from "./registry/maritalk/index.ts";
 import { basetenProvider } from "./registry/baseten/index.ts";
 import { geminiProvider } from "./registry/gemini/index.ts";
 import { gemini_webProvider } from "./registry/gemini/web/index.ts";
-import { gemini_businessProvider } from "./registry/gemini/business/index.ts";
 import { clineProvider } from "./registry/cline/index.ts";
 import { herokuProvider } from "./registry/heroku/index.ts";
 import { bluesmindsProvider } from "./registry/bluesminds/index.ts";
@@ -230,6 +230,7 @@ import { x5labProvider } from "./registry/x5lab/index.ts";
 import { kenariProvider } from "./registry/kenari/index.ts";
 import { navyProvider } from "./registry/navy/index.ts";
 import { naraProvider } from "./registry/nara/index.ts";
+import { xkiroProvider } from "./registry/xkiro/index.ts";
 import { opperProvider } from "./registry/opper/index.ts";
 import { requestyProvider } from "./registry/requesty/index.ts";
 import { sealionProvider } from "./registry/sealion/index.ts";
@@ -245,10 +246,17 @@ import { zyloApiProvider } from "./registry/zylo-api/index.ts";
 import { poolsideProvider } from "./registry/poolside/index.ts";
 import { fastrouterProvider } from "./registry/fastrouter/index.ts";
 import { anyapiProvider } from "./registry/anyapi/index.ts";
+import { beatapiProvider } from "./registry/beatapi/index.ts";
 import { electronhubProvider } from "./registry/electronhub/index.ts";
 import { llmgatewayProvider } from "./registry/llmgateway/index.ts";
+import { lyceumProvider } from "./registry/lyceum/index.ts";
 import { llmKiwiProvider } from "./registry/llm-kiwi/index.ts";
 import { literouterProvider } from "./registry/literouter/index.ts";
+import { greenptProvider } from "./registry/greenpt/index.ts";
+import { onomeoProvider } from "./registry/onomeo/index.ts";
+import { eurouterProvider } from "./registry/eurouter/index.ts";
+import { unificallyProvider } from "./registry/unifically/index.ts";
+import { yApiProvider } from "./registry/y-api/index.ts";
 import { mnnAiProvider } from "./registry/mnn-ai/index.ts";
 import { meganovaAiProvider } from "./registry/meganova-ai/index.ts";
 import { mixlayerProvider } from "./registry/mixlayer/index.ts";
@@ -280,7 +288,6 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   synthetic: syntheticProvider,
   ideogram: ideogramProvider,
   friendliai: friendliaiProvider,
-  suno: sunoProvider,
   "adapta-web": adapta_webProvider,
   "notion-web": notion_webProvider,
   anthropic: anthropicProvider,
@@ -359,7 +366,6 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   openai: openaiProvider,
   snowflake: snowflakeProvider,
   huggingface: huggingfaceProvider,
-  chipotle: chipotleProvider,
   freeaiapikey: freeaiapikeyProvider,
   "qwen-cloud": qwen_cloudProvider,
   "qwen-cloud-token-plan": qwen_cloud_token_planProvider,
@@ -376,6 +382,7 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   "lambda-ai": lambda_aiProvider,
   "t3-web": t3_webProvider,
   "conol-web": conol_webProvider,
+  chatplayground: chatplaygroundProvider,
   iflytek: iflytekProvider,
   crof: crofProvider,
   moonshot: moonshotProvider,
@@ -407,9 +414,11 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   "gitlawb-gmi": gitlawb_gmiProvider,
   gitlawb: gitlawbProvider,
   liquid: liquidProvider,
+  "arcee-ai": arceeAiProvider,
   deepinfra: deepinfraProvider,
   agy: agyProvider,
   agnes: agnesProvider,
+  "agnes-cn": agnes_cnProvider,
   aihorde: aihordeProvider,
   ainative: ainativeProvider,
   aion: aionProvider,
@@ -474,7 +483,6 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   baseten: basetenProvider,
   gemini: geminiProvider,
   "gemini-web": gemini_webProvider,
-  "gemini-business": gemini_businessProvider,
   cline: clineProvider,
   heroku: herokuProvider,
   bluesminds: bluesmindsProvider,
@@ -504,6 +512,7 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   kenari: kenariProvider,
   navy: navyProvider,
   nara: naraProvider,
+  xkiro: xkiroProvider,
   opper: opperProvider,
   requesty: requestyProvider,
   sealion: sealionProvider,
@@ -520,10 +529,17 @@ export const REGISTRY: Record<string, RegistryEntry> = {
   poolside: poolsideProvider,
   fastrouter: fastrouterProvider,
   anyapi: anyapiProvider,
+  beatapi: beatapiProvider,
   electronhub: electronhubProvider,
   llmgateway: llmgatewayProvider,
+  lyceum: lyceumProvider,
   "llm-kiwi": llmKiwiProvider,
   literouter: literouterProvider,
+  greenpt: greenptProvider,
+  onomeo: onomeoProvider,
+  eurouter: eurouterProvider,
+  unifically: unificallyProvider,
+  "y-api": yApiProvider,
   "mnn-ai": mnnAiProvider,
   "meganova-ai": meganovaAiProvider,
   mixlayer: mixlayerProvider,
