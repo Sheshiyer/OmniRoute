@@ -86,7 +86,10 @@ import { dispatchChatWithAffinityEviction } from "./chatDispatch";
 import { getCachedSettings, getCombosCacheVersion } from "@/lib/db/readCache";
 import { comboCheckProvider, ghComboGate } from "./chat/githubLiveCatalogFilter.ts";
 import { markEmergencyFallback } from "./emergencyFallbackHeader.ts";
-import { evaluateComboTargetPreflight } from "./chat/comboTargetKeyPolicy.ts";
+import {
+  evaluateComboTargetPreflight,
+  isExplicitlyAllowedComboForKey,
+} from "./chat/comboTargetKeyPolicy.ts";
 import { recordGateRejection, recordQuotaParkedSkip } from "./quotaParkedSkipUsage";
 import { getCombos } from "@/lib/db/combos";
 import { resolveModelLockoutSettings } from "@/lib/resilience/modelLockoutSettings";
@@ -1299,6 +1302,9 @@ async function handleChatImplementation(
             // alias. Preserve that context while every resolved target remains
             // subject to its own blocked/group/publication policy checks.
             authorizationContextModel: resolvedModelStr,
+            // #14197: a stored combo named in the key's allowedCombos grants its
+            // own targets; only connection/reasoning overrides are rechecked.
+            comboGrantsTargets: isExplicitlyAllowedComboForKey(apiKeyInfo, resolvedModelStr),
             forcedConnectionId: target?.connectionId ?? null,
             allowedConnectionIds: target?.allowedConnectionIds ?? null,
             comboStepId: target?.stepId || null,
@@ -1544,6 +1550,8 @@ async function handleSingleModelChat(
     reasoningTransportFallback?: "skip" | "drop";
     /** Original request identity admitted by combo/alias preflight. */
     authorizationContextModel?: string | null;
+    /** Server-computed: the admitted combo is explicitly allowed and grants its targets. */
+    comboGrantsTargets?: boolean;
     managedLease?: ManagedLeaseDispatchContext | null;
     /** #12150 P1b: video-bridge log/Memory shadow — undefined on every non-video request. */
     videoBridgeLog?: VideoBridgeLog;
@@ -1676,17 +1684,28 @@ async function handleSingleModelChat(
     runtimeOptions.authorizationContextModel.trim().length > 0
       ? runtimeOptions.authorizationContextModel.trim()
       : modelStr;
+  // An explicitly allowed stored combo authorizes its own target (#14197); any
+  // other model a connection/reasoning override swaps in is still checked.
+  const comboGrantedTargets =
+    runtimeOptions.comboGrantsTargets === true
+      ? new Set([
+          `${provider}/${model}`,
+          modelStr.includes("/") ? modelStr : `${provider}/${modelStr}`,
+        ])
+      : null;
   // Entry admission authorizes the requested model string. Resolve aliases and
   // target overrides before dispatch, then require the same key to admit both.
-  const modelPermission = await checkResolvedModelPermission(
-    {
-      hasApiKeyMetadata: Boolean(apiKeyInfo),
-      apiKey: extractApiKey(request),
-      requestedModel: authorizationContextModel,
-      resolvedModel: `${provider}/${model}`,
-    },
-    isModelAllowedForKey
-  );
+  const modelPermission = comboGrantedTargets
+    ? "allowed"
+    : await checkResolvedModelPermission(
+        {
+          hasApiKeyMetadata: Boolean(apiKeyInfo),
+          apiKey: extractApiKey(request),
+          requestedModel: authorizationContextModel,
+          resolvedModel: `${provider}/${model}`,
+        },
+        isModelAllowedForKey
+      );
   if (modelPermission !== "allowed") {
     return markLocalModelPolicyResponse(
       errorResponse(
@@ -2048,13 +2067,20 @@ async function handleSingleModelChat(
       }
       // Connection defaults and reasoning rules can replace an admitted alias.
       // Recheck before token refresh or any upstream dispatch.
+      // requestBody.model is only a new target when an override rewrote it; the
+      // client's own model string (e.g. the combo name) was admitted at entry.
       const effectivePolicyTargets = new Set([`${provider}/${effectiveModel}`]);
-      if (typeof requestBody.model === "string" && requestBody.model.length > 0) {
+      if (
+        typeof requestBody.model === "string" &&
+        requestBody.model.length > 0 &&
+        requestBody.model !== body?.model
+      ) {
         effectivePolicyTargets.add(
           requestBody.model.includes("/") ? requestBody.model : `${provider}/${requestBody.model}`
         );
       }
       for (const resolvedModel of effectivePolicyTargets) {
+        if (comboGrantedTargets?.has(resolvedModel)) continue;
         const effectivePermission = await checkResolvedModelPermission(
           {
             hasApiKeyMetadata: Boolean(apiKeyInfo),
@@ -2066,6 +2092,7 @@ async function handleSingleModelChat(
         );
         if (effectivePermission !== "allowed") {
           releaseOAuthSession();
+          agyLease.release(leaseId);
           return markLocalModelPolicyResponse(
             errorResponse(
               effectivePermission === "denied"
